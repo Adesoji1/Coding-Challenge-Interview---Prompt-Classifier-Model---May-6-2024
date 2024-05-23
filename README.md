@@ -40,7 +40,7 @@ The dataset was obatined from the postgresql database and saved as csv file, a p
 
 ### Why GloVe Embeddings? 🧠
 
-GloVe (Global Vectors for Word Representation) embeddings are used because they capture semantic relationships between words, providing richer contextual information compared to simple one-hot encoding or TF-IDF vectors. i used the 300D specification which is located [here](multilabel-text-classification/glove.6B.300d.txt)
+GloVe (Global Vectors for Word Representation) embeddings are used because they capture semantic relationships between words, providing richer contextual information compared to simple one-hot encoding or TF-IDF vectors. i used the 300D specification which is located [here](https://drive.google.com/file/d/1UVGifJPfMaYcW6NXNB3PiZAir6fof0tf/view?usp=sharing) in google drive
 
 ### Why Class Weights? ⚖️
 
