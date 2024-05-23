@@ -289,7 +289,7 @@ I discovered that we could add more training data using this code located at [te
 
 Training the model took
 
- approximately 166 minutes on a dataset of about 3,000 rows, achieving a test accuracy of 94%.
+ approximately 166 minutes on a dataset of about 3,000 rows, achieving a test accuracy of 97%.
 
 ### `requirements.txt`
 
@@ -424,6 +424,9 @@ The second model, which is the model of choice has 97% accuracy as seen above in
 - [Streamlit Documentation](https://docs.streamlit.io/en/stable/)
 
 ---
+## Caution ⚠️
+
+For database connections, it 's advisable you use environment variables to protect sensitive information from being exposed to the public!
 
 ![GitHub](https://img.icons8.com/ios/452/github.png)
   
