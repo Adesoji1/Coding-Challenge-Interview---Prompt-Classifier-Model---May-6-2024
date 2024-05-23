@@ -1,33 +1,49 @@
 # Coding-Challenge-Interview---Prompt-Classifier-Model---May-6-2024
- Create a classifier that will accurately classify a list of reddit comments into the proper labels.
- # Multilabel Text Classification Using CNN and Bi-LSTM 🎉📚🤖
 
+ Create a classifier that will accurately classify a list of reddit comments into the proper labels.
+
+# Multilabel Text Classification Using CNN and Bi-LSTM 🎉📚🤖
 ![Text Classification](https://img.icons8.com/ios/452/language.png)
 
 This project demonstrates how to build a multilabel text classification model using a combination of Convolutional Neural Networks (CNN) and Bidirectional Long Short-Term Memory Networks (Bi-LSTM). The model is trained using the TensorFlow and Keras libraries. We also use the GloVe word embeddings to enhance the model's performance and class weights to handle class imbalance.
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Data Preprocessing](#data-preprocessing)
-- [Model Architecture](#model-architecture)
-- [Training](#training)
-- [Evaluation](#evaluation)
-- [Usage](#usage)
-- [Streamlit Web App](#streamlit-web-app)
-- [Why We Didn't Use GPT-2 or LLM](#why-we-didnt-use-gpt-2-or-llm)
-- [Requirements](#requirements)
-- [References](#references)
+- [Overview](#overview-)
+- [Database](#database)
+- [Dataset](#dataset)
+- [Installation](#installation-)
+- [Data Preprocessing](#data-preprocessing-)
+- [Model Architecture](#model-architecture-️)
+- [Training](#training-️️)
+- [Evaluation](#evaluation-)
+- [Usage](#usage-)
+- [Streamlit Web App](#streamlit-web-app-)
+- [Why I Use GPT 2?](#why-i-use-gpt-2--)
+- [Text Generation](#text-generation)
+- [Requirements](#requirements-)
+- [Screenshots](#screenshots-)
+- [Accuracy](#accuracy-)
+- [References](#references-)
 
 ## Overview 💡
 
-Multilabel text classification involves assigning multiple labels to a given piece of text. This project utilizes a combination of CNN and Bi-LSTM networks to capture both local and sequential patterns in text data. 
+Multilabel text classification involves assigning multiple labels to a given piece of text. This project utilizes a combination of CNN and Bi-LSTM networks to capture both local and sequential patterns in text data.
+
+### Database
+
+Activites of logging into the database and making queries , updating the reddit_username_comments with  label update ![label_update](images/label_update.png) and  also leaving the other  values  in the labels column unlabelled as instructed [here](images/label_blank.png) . The sql queries used to interact with the database could be found [here] () while the python code for exporting the data from the database to csv could be found [here](multilabel-text-classification/exportdatatocsv.py) , the connection to database python code is also found [here](multilabel-text-classification/database.py) and updating labels in the reddit_user_comments database code is found [here](multilabel-text-classification/updatelabelindb.py) . The requirements.txt for these codes to work is also located [here](multilabel-text-classification/requirementsfordatabaseconnectionusingpython.txt), most of my rough work for connecting to the database is found [here](multilabel-text-classification/test.ipynb) because i originally did the work there, therefore you could see the outputs.
+
+### Dataset
+
+The dataset was obatined from the postgresql database and saved as csv file, a python code like this could do the [job](multilabel-text-classification/exportdatatocsv.py). the sample of the dataset is availabel [here](Dataset)
 
 ### Why GloVe Embeddings? 🧠
-GloVe (Global Vectors for Word Representation) embeddings are used because they capture semantic relationships between words, providing richer contextual information compared to simple one-hot encoding or TF-IDF vectors.
+
+GloVe (Global Vectors for Word Representation) embeddings are used because they capture semantic relationships between words, providing richer contextual information compared to simple one-hot encoding or TF-IDF vectors. i used the 300D specification which is located [here](multilabel-text-classification/glove.6B.300d.txt)
 
 ### Why Class Weights? ⚖️
+
 Class weights are employed to handle class imbalance, ensuring that the model does not become biased towards the majority class. This is critical in real-world scenarios where certain classes may be underrepresented.
 
 ## Installation 💻
@@ -47,8 +63,12 @@ pip install -r requirements.txt
 2. **Encoding**: Labels are encoded using `LabelEncoder` and `OneHotEncoder` to facilitate training.
 
 3. **Tokenization**: Text data is tokenized and padded to ensure uniform input length for the neural network.
+4. **Label Imbalance**: In order to balance the imbalance labels as seen here, ![Label Distribution](images/label_distribution.png)
+
+i had to use class weights from scikit-learn to improve the labels with the minority class.
 
 ### Why is this important? 🤔
+
 - **Normalization** ensures that the text data is clean and consistent.
 - **Encoding** is crucial for converting categorical labels into a numerical format that the model can understand.
 - **Tokenization** transforms the text into sequences of numbers, making it suitable for input to the neural network.
@@ -70,9 +90,10 @@ onehot_encoder = OneHotEncoder(sparse_output=False)
 y_onehot = onehot_encoder.fit_transform(y_encoded.reshape(-1, 1))
 ```
 
-## Model Architecture 🏗️
+### Model Architecture 🏗️
 
 The model architecture includes:
+
 - **Embedding Layer**: Uses pre-trained GloVe embeddings to convert words into dense vectors.
 - **SpatialDropout1D Layer**: Prevents overfitting by randomly setting entire feature maps to zero.
 - **Conv1D Layer**: Extracts local patterns in text.
@@ -81,12 +102,14 @@ The model architecture includes:
 - **Dense Layers**: Fully connected layers for classification.
 
 ### Why this architecture? 💭
+
 - **Embedding Layer** with GloVe vectors helps in understanding the semantic meaning of words.
 - **SpatialDropout1D** helps in regularization, making the model more robust.
 - **Conv1D** captures local dependencies and patterns in the text.
 - **Bi-LSTM** handles long-term dependencies and context in both directions.
 - **GlobalAveragePooling1D** reduces the dimensionality without losing important features.
-- **Dense Layers** are used for final classification.
+- **Dense Layers** are used for final classification.  Kindly view the  graphical architecture!
+[here](images/architecture.png) while the code representation is here below
 
 ```python
 # Define the model
@@ -103,12 +126,38 @@ preds = Dense(y_train.shape[1], activation="softmax")(x)
 
 ## Training 🏋️‍♂️
 
-The model is trained using class weights to handle class imbalance and `ModelCheckpoint` to save the best model based on validation accuracy.
+First, i trained the model without preprocessing and i got a test accuracy of 94% as seen ![below](images/trained_withoutpreprocessing.png) with the model accuracy plot ![here](images/modelwithoutpreprocessingmodelaccuracy.png)  
+and the model loss as seen ![here](images/modelwithoutpreprocessingmodelloss.png) This took about 166minutes to complete training for 10 epochs using a 6GB Nvidia graphics memory card. The training script could be found [here](multilabel-text-classification/firstmodel.py).  some of the prediction results are [in](multilabel-text-classification/test3.ipynb) the roughwork, also as seen below
+
+![firstmodel](images/firstmodelpred.png)
+
+![firstmodel](images/firstmodelpredi.png)
+
+![firstmodel](images/firstmodelpredic.png)
+
+ The 2nd model , still using the same architecture as seen previously in the first model, and the better model which trained for 97minutes,29.6 seconds had a test accuracy  of 97% when the data was preprocessed before training meaning that additional noise was removed in the dataset. the screenshot of the training,model performance and inference are seen below. 
+ 
+ 
+ ![secondmodel](images/secondmodelepochs.png)
+
+![secondmodel](images/secondmodelaccuracy.png)
+
+![secondmodel](images/secondmodelloss.png)
+
+![secondmodel](images/secondmodelpred.png)
+
+
+ 
+ 
+ 
+ The script for training the second model is located [here](multilabel-text-classification/secondmodel.py)   while the roughwork  where the script was originally creates is  located [here](multilabel-text-classification/test3.ipynb) .In addition, i ensured it was trained using class weights to handle class imbalance and `ModelCheckpoint` to save the best model based on validation accuracy. The model artifacts which include the keras model,the tokenizer and label file is located [here](checkpoints/best_modellatest2.keras) . For making inference using a csv as an input file for prediction, the script is located [here](multilabel-text-classification/secondmodelinferencefromcsv.py) for your reference while for using a single comment, it's found [here](multilabel-text-classification/secondmodelinferencefromcsv.py)
 
 ### Why use class weights? ⚖️
+
 Class weights ensure that the model gives proper attention to minority classes, preventing it from being biased towards the majority class.
 
 ### Why use ModelCheckpoint? 💾
+
 `ModelCheckpoint` saves the best model during training, ensuring that the best performing model is preserved.
 
 ```python
@@ -218,28 +267,33 @@ if __name__ == '__main__':
     main()
 ```
 
-Run the Streamlit app using the command:
+Run the Streamlit app using the command, the streamlit  web application folder is located [here](Webapp_Streamlit) while it's predictions are in the screenshot segment below  --- >[Screenshots](#screenshots-):
 
 ```sh
 streamlit run app.py
 ```
 
-## Why We Didn't Use GPT-2 or LLM 🤔💸
+## Why I Use GPT-2  🤔💸
 
-We chose not to use GPT-2 or other large language models for text generation in order to save on computational costs. Instead, we used the `set_seed` function in the transformers pipeline to create more comments, usernames, and labels. This approach allowed us to generate the necessary data efficiently and cost-effectively.
+I chose  to use GPT-2  for text generation in order to save on . I used the `set_seed` function in the transformers pipeline to create more comments, usernames, and labels. This approach allowed us to generate the necessary data efficiently and cost-effectively more details is in the textgenerator.py code.
+
+## Text Generation
+
+I discovered that we could add more training data using this code located at [textgenerator.py](multilabel-text-classification/textgenerator.py) , depending on your requirements, i created the python code to generate more comments,labels and username
 
 ## Requirements 📋
 
 - Python 3.11 virtual environment
 - Ubuntu 23.04
-- NVIDIA GPU with 6GB memory
+- NVIDIA GPU with 6GB memory ,NVIDIA GEFORCE RTX 2060
 
 Training the model took
 
  approximately 166 minutes on a dataset of about 3,000 rows, achieving a test accuracy of 94%.
 
 ### `requirements.txt`
-```
+
+```console markdown
 absl-py==2.1.0
 asttokens==2.4.1
 astunparse==1.6.3
@@ -341,7 +395,27 @@ urllib3==2.2.1
 wcwidth==0.2.13
 Werkzeug==3.0.3
 wrapt==1.16.0
+
 ```
+
+## Screenshots 📸
+
+kindly view the model accuracy![this](images/screenshot.png)
+
+
+and the predictions from the web app of streamlit below showing the client-side and server-side interaction.
+
+![a](images/a.png)
+![b](images/b.png)
+![c](images/c.png)
+![d](images/d.png)
+![e](images/e.png)
+![f](images/f.png)
+
+
+## Accuracy 🎯
+
+The second model, which is the model of choice has 97% accuracy as seen above in the screenshot
 
 ## References 📚
 
@@ -352,7 +426,8 @@ wrapt==1.16.0
 ---
 
 ![GitHub](https://img.icons8.com/ios/452/github.png)
-Feel free to contribute to this project on GitHub! 🖥️
+  
+  Feel free to contact  me on this project on GitHub at Adesoji1 or email me at <adesoji.alu@gmail.com> ! 🖥️
 
 ---
 
